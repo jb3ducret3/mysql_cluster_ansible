@@ -1,0 +1,19 @@
+---
+- name: Create table and insert data into Connexions table
+  hosts: srv-sql1
+  become: yes
+  tasks:
+    - name: Create Connexions table
+      shell: |
+        mysql -u root -p'user' -e "USE galera_cluster_db;
+        CREATE TABLE Connexions (
+          Connexion_id INT AUTO_INCREMENT PRIMARY KEY,
+          Utilisateur_id INT,
+          Timestamp DATETIME,
+          FOREIGN KEY (Utilisateur_id) REFERENCES Utilisateurs(Id)
+        );"
+
+    - name: Insert data into Connexions table
+      shell: |
+        mysql -u root -p'user' -e "USE galera_cluster_db;
+        INSERT INTO Connexions (Utilisateur_id, Timestamp) VALUES (1030, '2024-02-07 10:00:00'), (1010, '2024-02-07 11:00:00'), (1020, '2024-02-07 12:00:00');"
