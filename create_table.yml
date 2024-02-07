@@ -1,0 +1,18 @@
+---
+- name: Create table and insert data into Utilisateurs table
+  hosts: srv-sql1
+  become: yes
+  tasks:
+    - name: Create Utilisateurs table
+      shell: |
+        mysql -u root -p'user' -e "USE galera_cluster_db;
+        CREATE TABLE Utilisateurs (
+          Id INT AUTO_INCREMENT PRIMARY KEY,
+          Nom VARCHAR(255),
+          Email VARCHAR(255)
+        );"
+
+    - name: Insert data into Utilisateurs table
+      shell: |
+        mysql -u root -p'user' -e "USE galera_cluster_db;
+        INSERT INTO Utilisateurs (Id, Nom, Email) VALUES (1010, 'Yann', 'yann@hotmail.com'), (1020, 'David', 'david@hotmail.com'), (1030, 'Dorian', 'dorian@hotmail.com');"
