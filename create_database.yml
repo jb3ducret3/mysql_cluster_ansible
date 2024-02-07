@@ -1,0 +1,10 @@
+---
+- name: Create database
+  hosts: srv-sql1
+  become: yes
+  tasks:
+    - name: Create database
+      shell: mysql -u root -p'user' -e "CREATE DATABASE TEST;"
+
+
+
