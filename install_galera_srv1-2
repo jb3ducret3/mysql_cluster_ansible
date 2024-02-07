@@ -1,0 +1,105 @@
+---
+- name: Installation de MariaDB et configuration Galera
+  hosts: srv-sql1:srv-sql2
+  become: true
+  tasks:
+    - name: Mise à jour du système
+      apt:
+        update_cache: yes
+        upgrade: yes
+
+    - name: Installation de MariaDB
+      apt:
+        name: mariadb-server
+        state: present
+
+    - name: Démarrage de MariaDB
+      systemd:
+        name: mariadb
+        state: started
+        enabled: yes
+
+- name: Installation de MariaDB et configuration Galera
+  hosts: srv-sql1
+  become: true
+  tasks:
+    - name: création de fichier
+      shell: touch /etc/mysql/conf.d/galera.cnf
+
+    - name: Configuration de Galera sur srv-sql1
+      blockinfile:
+        path: /etc/mysql/conf.d/galera.cnf
+        block: |
+          [mysqld]
+          binlog_format=ROW
+          default-storage-engine=innodb
+          innodb_autoinc_lock_mode=2
+          bind-address=0.0.0.0
+          # Galera Provider Configuration
+          wsrep_on=ON
+          wsrep_provider=/usr/lib/galera/libgalera_smm.so
+          # Galera Cluster Configuration
+          wsrep_cluster_name="test_cluster"
+          wsrep_cluster_address="gcomm://192.168.240.243,192.168.240.244"
+          # Galera Synchronization Configuration
+          wsrep_sst_method=rsync
+          # Galera Node Configuration
+          wsrep_node_address="192.168.240.243"
+          wsrep_node_name="srv-sql1"
+
+- name: Installation de MariaDB et configuration Galera
+  hosts: srv-sql2
+  become: true
+  tasks:
+    - name: création de fichier
+      shell: touch /etc/mysql/conf.d/galera.cnf
+
+    - name: Configuration de Galera sur srv-sql2
+      blockinfile:
+        path: /etc/mysql/conf.d/galera.cnf
+        block: |
+          [mysqld]
+          binlog_format=ROW
+          default-storage-engine=innodb
+          innodb_autoinc_lock_mode=2
+          bind-address=0.0.0.0
+          # Galera Provider Configuration
+          wsrep_on=ON
+          wsrep_provider=/usr/lib/galera/libgalera_smm.so
+          # Galera Cluster Configuration
+          wsrep_cluster_name="test_cluster"
+          wsrep_cluster_address="gcomm://192.168.240.243,192.168.240.244"
+          # Galera Synchronization Configuration
+          wsrep_sst_method=rsync
+          # Galera Node Configuration
+          wsrep_node_address="192.168.240.244"
+          wsrep_node_name="srv-sql2"
+
+- name: Installation de MariaDB et configuration Galera
+  hosts: srv-sql1:srv-sql2
+  become: true
+  tasks:
+    - name: Arrêt de MariaDB sur srv-sql1-sql2
+      systemd:
+        name: mariadb
+        state: stopped
+
+- name: Nouveau cluster sur srv-sql1
+  hosts: srv-sql1
+  become: true
+  tasks:
+    - name: Initialisation d'un nouveau cluster Galera sur srv-sql1
+      shell: galera_new_cluster
+
+    - name: Démarrage de MariaDB sur srv-sql1
+      shell: systemctl start mariadb
+
+- name: Démarrage de MariaDB sur srv-sql2
+  hosts: srv-sql2
+  become: true
+  tasks:
+    - name: Démarrage de MariaDB
+      systemd:
+        name: mariadb
+        state: started
+        enabled: yes
