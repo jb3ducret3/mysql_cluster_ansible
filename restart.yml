@@ -1,0 +1,14 @@
+---
+- name: Arrêt et redémarrage de MySQL
+  hosts: all
+  become: true
+  tasks:
+    - name: Arrêt de MySQL
+      systemd:
+        name: mysql
+        state: stopped
+
+    - name: Redémarrage de MySQL
+      systemd:
+        name: mysql
+        state: started
