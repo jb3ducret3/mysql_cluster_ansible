@@ -1,0 +1,6 @@
+(none)]> USE bdd1 ;
+[bdd1]> SELECT * FROM nom_de_table ;
+[bdd1]> SELECT nom_de_colonne FROM nom_de_table ;
+
+sudo apt-get install libmysqlclient-dev
+pip install mysqlclient
