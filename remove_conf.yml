@@ -1,0 +1,7 @@
+---
+- name: Suppression du fichier galera.cnf
+  hosts: srv-sql1:srv-sql2
+  become: true
+  tasks:
+    - name: Supprimer le fichier galera.cnf
+      shell: rm /etc/mysql/conf.d/galera.cnf
